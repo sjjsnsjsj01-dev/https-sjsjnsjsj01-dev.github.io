@@ -1,0 +1,76 @@
+{
+  "days": [
+    {
+      "date": "2026-03-02",
+      "city": "Dubai",
+      "channel": "KING EL GOLD VIP",
+      "trades": [
+        { "pair": "XAUUSD", "type": "BUY", "pip": 430, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 430, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 430, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 480, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 160, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 160, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 160, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 140, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 140, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 140, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "loss" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "loss" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 270, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 270, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 270, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 270, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 150, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 150, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 150, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 620, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 620, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 620, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 250, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 320, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 310, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 310, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 310, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 150, "result": "loss" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 150, "result": "loss" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 100, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 100, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 100, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "loss" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 200, "result": "loss" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 420, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 420, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 420, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 420, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 350, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 350, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 350, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 370, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 470, "result": "win" },
+
+        { "pair": "XAUUSD", "type": "BUY", "pip": 500, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 500, "result": "win" },
+        { "pair": "XAUUSD", "type": "BUY", "pip": 500, "result": "win" }
+      ]
+    }
+  ]
+}
