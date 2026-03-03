@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KING EL GOLD | منصة التحليلات المؤسسية</title>
+    
+    <!-- Fonts: Cairo for Arabic, Inter for Numbers -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@400;600;700&display=swap">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #050810;
+            --bg-panel: rgba(11, 18, 32, 0.75);
+            --gold-primary: #D4AF37;
+            --gold-light: #F5C542;
+            --gold-dark: #B8860B;
+            --emerald: #00C853;
+            --red: #EF4444;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border: rgba(212, 175, 55, 0.2);
+            --glass: blur(20px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Background Skyline */
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: 
+                linear-gradient(to top, var(--bg-deep) 5%, transparent 100%),
+                url('https://images.unsplash.com/photo-1512453979798-5ea904ac66de?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center bottom;
+            opacity: 0.15;
+            z-index: -1;
+            filter: grayscale(100%) contrast(120%);
+            pointer-events: none;
+        }
+
+        /* Grid Overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Loading Overlay */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-deep);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error Panel */
+        #error-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(20, 10, 10, 0.95);
+            border: 1px solid var(--red);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            z-index: 9998;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        #error-panel i {
+            font-size: 40px;
+            color: var(--red);
+            margin-bottom: 20px;
+        }
+
+        #error-panel h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        #error-panel p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .btn-retry {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-retry:hover { background: #dc2626; }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .brand h1 {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+        }
+
+        .brand p {
+            font-size: 14px;
+            color: var(--gold-primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .live-clock {
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            direction: ltr;
+            background: rgba(255,255,255,0.03);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .time {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Hero Text */
+        .hero-text {
+            text-align: center;
+            margin-bottom: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-text h2 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .hero-text .slogan {
+            font-size: 16px;
+            color: var(--gold-primary);
+            font-style: italic;
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
+        }
+        
+        .hero-text .slogan::before, .hero-text .slogan::after {
+            content: '—';
+            color: var(--text-muted);
+            margin: 0 10px;
+        }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gold-primary);
+        }
+
+        .kpi-card.profit::before { background: var(--emerald); }
+        .kpi-card.loss::before { background: var(--red); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .kpi-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .kpi-icon {
+            color: var(--gold-primary);
+            font-size: 20px;
+            opacity: 0.8;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            direction: ltr;
+            display: inline-block;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-sm {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .text-green { color: var(--emerald); }
+        .text-red { color: var(--red); }
+        .text-gold { color: var(--gold-primary); }
+
+        /* Controls Section */
+        .controls-section {
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+            color: var(--bg-deep);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .btn-outline:hover {
+            border-color: var(--gold-primary);
+            color: #fff;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            height: 400px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-title i { color: var(--gold-primary); }
+
+        /* Advanced Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin: 10px 0;
+            font-family: 'Inter', sans-serif;
+            direction: ltr;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Table & Modal */
+        .table-container {
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: right;
+            padding: 15px 25px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(0,0,0,0.2);
+        }
+
+        td {
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+            color: #fff;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .badge-dubai { background: rgba(212, 175, 55, 0.2); color: var(--gold-light); }
+        .badge-london { background: rgba(42, 171, 238, 0.2); color: #2AABEE; }
+        .badge-ny { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #0b1220;
+            border: 1px solid var(--gold-primary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-modal:hover { color: #fff; }
+
+        .trade-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .trade-item {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-right: 3px solid transparent;
+        }
+
+        .trade-item.win { border-right-color: var(--emerald); }
+        .trade-item.loss { border-right-color: var(--red); }
+
+        .trade-info h4 { font-size: 14px; color: #fff; margin-bottom: 4px; }
+        .trade-info p { font-size: 12px; color: var(--text-muted); }
+        .trade-pip { font-weight: 700; font-family: 'Inter', sans-serif; direction: ltr; }
+        .trade-pip.win { color: var(--emerald); }
+        .trade-pip.loss { color: var(--red); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .chart-card { height: 350px; }
+        }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; align-items: flex-start; }
+            .live-clock { width: 100%; text-align: right; direction: rtl; }
+            .controls-section { flex-direction: column; }
+            .control-group { width: 100%; }
+            .kpi-value { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <h2 style="color: var(--gold-primary); font-weight: 700; font-size: 20px;">جاري الاتصال بخادم البيانات المؤسسي...</h2>
+        <p style="color: var(--text-muted); margin-top: 10px; font-size: 14px;">KING EL GOLD SYSTEM v4.2</p>
+    </div>
+
+    <!-- Error Panel -->
+    <div id="error-panel">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h3>فشل تحميل البيانات</h3>
+        <p>تعذر الاتصال بمصدر البيانات الرسمي أو أن الملف غير متاح حالياً. يرجى التحقق من اتصال الإنترنت أو المحاولة لاحقاً.</p>
+        <button class="btn-retry" onclick="location.reload()">
+            <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="main-content" style="display: none; opacity: 0; transition: opacity 0.5s;">
+        
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <h1>KING EL GOLD</h1>
+                <p>الأستاذ خالد — ملك الذهب</p>
+            </div>
+            
+            <div class="live-clock">
+                <div class="time" id="clock-time">00:00:00</div>
+                <div class="date" id="clock-date">جاري التحميل...</div>
+            </div>
+        </header>
+
+        <!-- Hero Text -->
+        <div class="hero-text">
+            <h2>نظام التحليل المؤسسي لأداء سكالب الذهب العالمي (XAUUSD)</h2>
+            <div class="slogan">الانضباط يولد الثقة — والثقة تبني الاستمرارية</div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <!-- Today -->
+            <div class="kpi-card profit">
+                <div class="kpi-header">
+                    <span class="kpi-title">صافي اليوم</span>
+                    <i class="fa-solid fa-bolt kpi-icon"></i>
+                </div>
+                <div class="kpi-value" id="kpi-today">0</div>
+                <div class="kpi-sub">
+                    <span class="text-green"><i class="fa-solid fa-arrow-trend-up"></i> <span id="kpi-today-count">0</span> صفقة</span>
+                    <span class="badge-sm" id="kpi-today-rate">0%</span>
+                </div>
+            </div>
+
+            <!-- Week -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">آخر 7 أيام</span>
+                    <i class="fa-solid fa-calendar-week kpi-icon"></i>
+                </div>
+                <div class="kpi-value" id="kpi-week">0</div>
+                <div class="kpi-sub">
+                    <span style="color: var(--text-muted)">صافي النقاط</span>
+                </div>
+            </div>
+
+            <!-- Month -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">أداء الشهر</span>
+                    <i class="fa-solid fa-calendar kpi-icon"></i>
+                </div>
+                <div class="kpi-value" id="kpi-month">0</div>
+                <div class="kpi-sub">
+                    <span class="text-green" id="kpi-month-growth">+0% نمو</span>
+                </div>
+            </div>
+
+            <!-- Year -->
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">إجمالي السنة</span>
+                    <i class="fa-solid fa-trophy kpi-icon"></i>
+                </div>
+                <div class="kpi-value" id="kpi-year">0</div>
+                <div class="kpi-sub">
+                    <span style="color: var(--text-muted)">منذ 1 يناير</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls & Filters -->
+        <div class="controls-section">
+            <div class="control-group">
+                <label class="control-label">تاريخ من</label>
+                <input type="date" id="date-start" class="form-control">
+            </div>
+            <div class="control-group">
+                <label class="control-label">تاريخ إلى</label>
+                <input type="date" id="date-end" class="form-control">
+            </div>
+            <div class="control-group">
+                <label class="control-label">اختر المدينة</label>
+                <select id="city-filter" class="form-control">
+                    <option value="all">جميع المدن</option>
+                    <option value="Dubai">دبي</option>
+                    <option value="London">لندن</option>
+                    <option value="New York">نيويورك</option>
+                </select>
+            </div>
+            <div class="control-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                <button class="btn" onclick="applyFilters()">
+                    <i class="fa-solid fa-filter"></i> تطبيق
+                </button>
+                <button class="btn btn-outline" onclick="resetFilters()">
+                    <i class="fa-solid fa-rotate-right"></i> إعادة تعيين
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">نسبة النجاح العامة</div>
+                <div class="metric-value" id="metric-winrate">0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">إجمالي الصفقات</div>
+                <div class="metric-value" id="metric-total-trades">0</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">أفضل مدينة</div>
+                <div class="metric-value text-gold" id="metric-best-city">-</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">كثافة التداول</div>
+                <div class="metric-value" id="metric-intensity">0</div>
+                <div style="font-size: 10px; color: var(--text-muted);">صفقة/يوم</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <!-- Main Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-chart-line"></i>
+                        منحنى النمو التراكمي (Pips)
+                    </div>
+                </div>
+                <div style="height: 320px; width: 100%;">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <!-- City Performance -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fa-solid fa-globe"></i>
+                        مقارنة المدن
+                    </div>
+                </div>
+                <div style="height: 320px; width: 100%;">
+                    <canvas id="cityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table & Modal Trigger -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3 style="font-size: 16px; color: #fff;">سجل الأيام التفصيلي</h3>
+                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 12px;" onclick="openModal()">
+                    <i class="fa-solid fa-list-ul"></i> عرض تفاصيل الصفقات
+                </button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المدينة</th>
+                            <th>القناة</th>
+                            <th>عدد الصفقات</th>
+                            <th>صافي النقاط</th>
+                            <th>النتيجة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Trade Details Modal -->
+    <div id="trade-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: #fff; font-size: 20px;">تفاصيل الصفقات المنفذة</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="trade-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. STATE MANAGEMENT
+        // ==========================================
+        let globalData = []; // Stores raw JSON
+        let processedData = []; // Stores flattened data for easier filtering
+        let mainChartInstance = null;
+        let cityChartInstance = null;
+
+        // ==========================================
+        // 2. INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            startClock();
+            await loadData();
+        });
+
+        async function loadData() {
+            const loader = document.getElementById('loader');
+            const errorPanel = document.getElementById('error-panel');
+            const mainContent = document.getElementById('main-content');
+
+            try {
+                // STRICT REQUIREMENT: Fetch from official hosted URL only
+                const response = await fetch('https://sjjsnsjsj01-dev.github.io/https-sjsjnsjsj01-dev.github.io/data.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const json = await response.json();
+                
+                if (!json.days || !Array.isArray(json.days)) {
+                    throw new Error('Invalid JSON structure: Missing "days" array');
+                }
+
+                globalData = json.days;
+                
+                // Process Data: Flatten nested trades for easier calculation
+                processedData = [];
+                globalData.forEach(day => {
+                    if (day.trades && Array.isArray(day.trades)) {
+                        day.trades.forEach(trade => {
+                            processedData.push({
+                                date: day.date,
+                                city: day.city,
+                                channel: day.channel,
+                                pair: trade.pair,
+                                type: trade.type,
+                                pip: trade.pip,
+                                result: trade.result
+                            });
+                        });
+                    }
+                });
+
+                // Set default dates
+                const today = new Date().toISOString().split('T')[0];
+                const lastMonth = new Date();
+                lastMonth.setMonth(lastMonth.getMonth() - 1);
+                
+                document.getElementById('date-start').value = lastMonth.toISOString().split('T')[0];
+                document.getElementById('date-end').value = today;
+
+                // Initial Render
+                applyFilters();
+                
+                // Hide Loader, Show Content
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    // Trigger fade in
+                    requestAnimationFrame(() => {
+                        mainContent.style.opacity = '1';
+                    });
+                }, 500);
+
+            } catch (error) {
+                console.error("Data Load Error:", error);
+                loader.style.display = 'none';
+                errorPanel.style.display = 'block';
+            }
+        }
+
+        // ==========================================
+        // 3. CORE LOGIC & FILTERS
+        // ==========================================
+        function applyFilters() {
+            const startStr = document.getElementById('date-start').value;
+            const endStr = document.getElementById('date-end').value;
+            const city = document.getElementById('city-filter').value;
+
+            if (!startStr || !endStr) return;
+
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+            endDate.setHours(23, 59, 59);
+
+            // Filter processed data
+            const filtered = processedData.filter(item => {
+                const itemDate = new Date(item.date);
+                const matchDate = itemDate >= startDate && itemDate <= endDate;
+                const matchCity = city === 'all' || item.city === city;
+                return matchDate && matchCity;
+            });
+
+            updateDashboard(filtered);
+        }
+
+        function resetFilters() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            
+            document.getElementById('date-start').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('date-end').value = today;
+            document.getElementById('city-filter').value = 'all';
+            applyFilters();
+        }
+
+        // ==========================================
+        // 4. DASHBOARD UPDATES
+        // ==========================================
+        function updateDashboard(data) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            // Start of week (Monday)
+            const curr = new Date();
+            const first = curr.getDate() - curr.getDay() + 1;
+            const monday = new Date(curr.setDate(first));
+            monday.setHours(0,0,0,0);
+
+            // Calculate KPIs from GLOBAL processed data (Live Status)
+            // Note: Top cards usually show "Live" status regardless of filter, 
+            // but table/charts show filtered. Let's keep KPIs Live as per "Auto Calculations" requirement.
+            
+            let liveToday = 0, liveWeek = 0, liveMonth = 0, liveYear = 0;
+            let liveTodayTrades = 0, liveTodayWins = 0;
+            let globalTotalTrades = 0, globalTotalWins = 0;
+            let cityStats = {};
+
+            processedData.forEach(item => {
+                const pipValue = item.result === 'win' ? item.pip : -item.pip;
+                const d = new Date(item.date);
+
+                // Global Aggregates
+                globalTotalTrades++;
+                if (item.result === 'win') globalTotalWins++;
+
+                // City Stats
+                if (!cityStats[item.city]) cityStats[item.city] = { pips: 0, trades: 0 };
+                cityStats[item.city].pips += pipValue;
+                cityStats[item.city].trades++;
+
+                // Time-based KPIs
+                if (item.date === todayStr) {
+                    liveToday += pipValue;
+                    liveTodayTrades++;
+                    if (item.result === 'win') liveTodayWins++;
+                }
+                if (d >= monday) liveWeek += pipValue;
+                if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) liveMonth += pipValue;
+                if (d.getFullYear() === currentYear) liveYear += pipValue;
+            });
+
+            // Update DOM Counters
+            animateValue("kpi-today", liveToday);
+            document.getElementById("kpi-today-count").innerText = liveTodayTrades;
+            const todayRate = liveTodayTrades > 0 ? Math.round((liveTodayWins / liveTodayTrades) * 100) : 0;
+            document.getElementById("kpi-today-rate").innerText = `${todayRate}%`;
+            document.getElementById("kpi-today-rate").className = `badge-sm ${todayRate >= 50 ? 'text-green' : 'text-red'}`;
+
+            animateValue("kpi-week", liveWeek);
+            animateValue("kpi-month", liveMonth);
+            animateValue("kpi-year", liveYear);
+
+            // Growth Calculation
+            const growth = liveMonth > 1000 ? ((liveMonth - 1000) / 1000) * 100 : 0;
+            document.getElementById("kpi-month-growth").innerText = `+${growth.toFixed(1)}% نمو`;
+
+            // Advanced Metrics
+            const globalWinRate = globalTotalTrades > 0 ? Math.round((globalTotalWins / globalTotalTrades) * 100) : 0;
+            document.getElementById("metric-winrate").innerText = `${globalWinRate}%`;
+            document.getElementById("metric-total-trades").innerText = globalTotalTrades.toLocaleString();
+
+            // Best City
+            let bestCity = '-';
+            let maxPips = -Infinity;
+            for (const [city, stats] of Object.entries(cityStats)) {
+                if (stats.pips > maxPips) {
+                    maxPips = stats.pips;
+                    bestCity = city;
+                }
+            }
+            document.getElementById("metric-best-city").innerText = bestCity;
+
+            // Intensity (Avg trades per day in filtered range)
+            // For simplicity, using global avg
+            const uniqueDays = new Set(processedData.map(d => d.date)).size;
+            const intensity = uniqueDays > 0 ? (globalTotalTrades / uniqueDays).toFixed(1) : 0;
+            document.getElementById("metric-intensity").innerText = intensity;
+
+            // Update Table (Based on Filtered Data)
+            updateTable(data);
+
+            // Update Charts (Based on Filtered Data)
+            updateCharts(data, cityStats);
+        }
+
+        function updateTable(data) {
+            const tbody = document.querySelector('#data-table tbody');
+            tbody.innerHTML = '';
+
+            // Group filtered data by day for table rows
+            const daysMap = {};
+            data.forEach(item => {
+                if (!daysMap[item.date]) {
+                    daysMap[item.date] = {
+                        date: item.date,
+                        city: item.city,
+                        channel: item.channel,
+                        trades: 0,
+                        netPips: 0,
+                        wins: 0
+                    };
+                }
+                daysMap[item.date].trades++;
+                daysMap[item.date].netPips += (item.result === 'win' ? item.pip : -item.pip);
+                if (item.result === 'win') daysMap[item.date].wins++;
+            });
+
+            const sortedDays = Object.values(daysMap).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (sortedDays.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">لا توجد بيانات في هذا النطاق</td></tr>';
+                return;
+            }
+
+            sortedDays.slice(0, 10).forEach(day => {
+                const isProfit = day.netPips >= 0;
+                const winRate = Math.round((day.wins / day.trades) * 100);
+                
+                const row = `
+                    <tr>
+                        <td>${day.date}</td>
+                        <td><span class="badge badge-${day.city === 'Dubai' ? 'dubai' : day.city === 'London' ? 'london' : 'ny'}">${day.city}</span></td>
+                        <td style="color: var(--text-muted); font-size: 12px;">${day.channel}</td>
+                        <td>${day.trades}</td>
+                        <td style="font-weight:bold; color: ${isProfit ? 'var(--emerald)' : 'var(--red)'}; direction: ltr;">
+                            ${isProfit ? '+' : ''}${day.netPips}
+                        </td>
+                        <td>
+                            <span class="${winRate >= 50 ? 'text-green' : 'text-red'}" style="font-size: 12px;">${winRate}% نجاح</span>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // ==========================================
+        // 5. CHARTS CONFIGURATION
+        // ==========================================
+        function updateCharts(data, cityStats) {
+            // Prepare Data for Line Chart (Cumulative)
+            // Group by date first
+            const dailyMap = {};
+            data.forEach(item => {
+                if (!dailyMap[item.date]) dailyMap[item.date] = 0;
+                dailyMap[item.date] += (item.result === 'win' ? item.pip : -item.pip);
+            });
+
+            const sortedDates = Object.keys(dailyMap).sort();
+            let cumulative = 0;
+            const labels = sortedDates.map(d => d.slice(5)); // MM-DD
+            const values = sortedDates.map(d => {
+                cumulative += dailyMap[d];
+                return cumulative;
+            });
+
+            // Main Chart (Line)
+            const ctxMain = document.getElementById('mainChart').getContext('2d');
+            if (mainChartInstance) mainChartInstance.destroy();
+
+            const gradientMain = ctxMain.createLinearGradient(0, 0, 0, 400);
+            gradientMain.addColorStop(0, 'rgba(212, 175, 55, 0.5)');
+            gradientMain.addColorStop(1, 'rgba(212, 175, 55, 0)');
+
+            mainChartInstance = new Chart(ctxMain, {
+                type: 'line',
+                 {
+                    labels: labels,
+                    datasets: [{
+                        label: 'النمو التراكمي',
+                         values,
+                        borderColor: '#D4AF37',
+                        backgroundColor: gradientMain,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(11, 18, 32, 0.9)',
+                            titleColor: '#D4AF37',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(212, 175, 55, 0.3)',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', maxTicksLimit: 10 } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+
+            // City Chart (Bar) - Use the cityStats passed from updateDashboard (which is global)
+            // Or recalculate based on filtered data if needed. Let's use global for "City Comparison" context usually,
+            // but to be consistent with filters, let's recalculate from 'data' arg.
+            const filteredCityStats = {};
+            data.forEach(item => {
+                if (!filteredCityStats[item.city]) filteredCityStats[item.city] = 0;
+                filteredCityStats[item.city] += (item.result === 'win' ? item.pip : -item.pip);
+            });
+
+            const ctxCity = document.getElementById('cityChart').getContext('2d');
+            if (cityChartInstance) cityChartInstance.destroy();
+
+            cityChartInstance = new Chart(ctxCity, {
+                type: 'bar',
+                 {
+                    labels: Object.keys(filteredCityStats),
+                    datasets: [{
+                        label: 'صافي النقاط',
+                        data: Object.values(filteredCityStats),
+                        backgroundColor: [
+                            'rgba(212, 175, 55, 0.7)',
+                            'rgba(42, 171, 238, 0.7)',
+                            'rgba(239, 68, 68, 0.7)'
+                        ],
+                        borderColor: [
+                            '#D4AF37', '#2AABEE', '#EF4444'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#fff' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 6. MODAL LOGIC
+        // ==========================================
+        function openModal() {
+            const modal = document.getElementById('trade-modal');
+            const body = document.getElementById('modal-body');
+            
+            // Get currently filtered data from inputs
+            const startStr = document.getElementById('date-start').value;
+            const endStr = document.getElementById('date-end').value;
+            const city = document.getElementById('city-filter').value;
+            
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+            endDate.setHours(23, 59, 59);
+
+            const filtered = processedData.filter(item => {
+                const itemDate = new Date(item.date);
+                const matchDate = itemDate >= startDate && itemDate <= endDate;
+                const matchCity = city === 'all' || item.city === city;
+                return matchDate && matchCity;
+            });
+
+            // Sort by date desc
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            body.innerHTML = filtered.map(trade => `
+                <div class="trade-item ${trade.result}">
+                    <div class="trade-info">
+                        <h4>${trade.pair} <span style="color: ${trade.type === 'BUY' ? 'var(--emerald)' : 'var(--red)'}">${trade.type}</span></h4>
+                        <p>${trade.date} • ${trade.city}</p>
+                    </div>
+                    <div class="trade-pip ${trade.result}">
+                        ${trade.result === 'win' ? '+' : '-'}${trade.pip} PIP
+                    </div>
+                </div>
+            `).join('');
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('trade-modal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('trade-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // ==========================================
+        // 7. UTILITIES
+        // ==========================================
+        function animateValue(id, end) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            
+            const start = 0;
+            const duration = 1500;
+            let startTimestamp = null;
+            
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = (end < 0 ? '-' : '') + Math.abs(value).toLocaleString();
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function startClock() {
+            const updateTime = () => {
+                const now = new Date();
+                
+                // Time
+                const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+                document.getElementById('clock-time').innerText = timeStr;
+
+                // Date (Arabic)
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('clock-date').innerText = now.toLocaleDateString('ar-SA', options);
+            };
+            setInterval(updateTime, 1000);
+            updateTime();
+        }
+    </script>
+</body>
+</html>
+
