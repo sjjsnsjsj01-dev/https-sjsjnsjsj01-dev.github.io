@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة أداء السكالب المؤسسي | الأستاذ خالد</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cairo@5.0.17/index.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-light: #F5C542;
+  --gold-dark: #B8860B;
+  --emerald: #00C853;
+  --navy: #0b1220;
+  --deep: #050810;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background:linear-gradient(135deg,var(--navy),var(--deep));
+  font-family:'Cairo',sans-serif;
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+.header{text-align:center;padding:40px 20px;}
+.header h1{
+  font-size:30px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.status{
+  margin-top:15px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(0,200,83,0.1);
+  border:1px solid rgba(0,200,83,0.3);
+  padding:8px 16px;
+  border-radius:20px;
+  font-size:12px;
+  color:var(--emerald);
+}
+.status-dot{
+  width:8px;height:8px;
+  background:var(--emerald);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  padding:30px;
+  max-width:1200px;
+  margin:auto;
+}
+.card{
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(212,175,55,.2);
+  border-radius:16px;
+  padding:25px;
+  text-align:center;
+  transition:.4s;
+}
+.card:hover{transform:translateY(-5px)}
+.card-number{font-size:28px;font-weight:700;color:var(--gold);direction:ltr}
+
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:15px;
+  max-width:1000px;
+  margin:20px auto;
+  padding:0 20px;
+}
+.stat-mini{
+  background:rgba(255,255,255,0.02);
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+}
+.stat-mini-value{font-size:18px;font-weight:600}
+
+.chart-container{
+  max-width:1100px;
+  margin:40px auto;
+  padding:30px;
+  background:rgba(255,255,255,0.03);
+  border-radius:20px;
+}
+canvas{height:300px!important}
+
+.loading{text-align:center;padding:60px;color:#64748b}
+.error{text-align:center;padding:40px;color:#ef4444}
+
+.footer{text-align:center;padding:30px;color:#64748b;font-size:12px}
+
+/* Back Button */
+.back-btn{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:55px;height:55px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));
+  color:var(--deep);
+  font-size:20px;
+  cursor:pointer;
+  transition:.4s;
+  z-index:9999;
+}
+.back-btn.hidden{transform:translateY(120px);opacity:0}
+.back-btn:hover{transform:scale(1.1)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><i class="fa-solid fa-chart-line"></i> لوحة أداء السكالب المؤسسي</h1>
+  <div class="status">
+    <span class="status-dot"></span>
+    النظام متصل • تحديث مباشر
+  </div>
+</div>
+
+<div id="loading" class="loading">
+  جاري تحميل البيانات...
+</div>
+
+<div id="error" class="error" style="display:none;">
+  تأكد من وجود ملف data.json
+</div>
+
+<div id="dashboard" class="dashboard" style="display:none;">
+  <div class="card"><div>نقاط اليوم</div><div class="card-number" id="today">0</div></div>
+  <div class="card"><div>هذا الأسبوع</div><div class="card-number" id="week">0</div></div>
+  <div class="card"><div>هذا الشهر</div><div class="card-number" id="month">0</div></div>
+  <div class="card"><div>هذه السنة</div><div class="card-number" id="year">0</div></div>
+  <div class="card"><div>صفقات اليوم</div><div class="card-number" id="trades">0</div></div>
+</div>
+
+<div id="statsRow" class="stats-row" style="display:none;">
+  <div class="stat-mini"><div>متوسط يومي</div><div class="stat-mini-value" id="avgDaily">0</div></div>
+  <div class="stat-mini"><div>أيام نشطة</div><div class="stat-mini-value" id="activeDays">0</div></div>
+  <div class="stat-mini"><div>إجمالي الصفقات</div><div class="stat-mini-value" id="totalTrades">0</div></div>
+</div>
+
+<div id="chartContainer" class="chart-container" style="display:none;">
+  <canvas id="chart"></canvas>
+</div>
+
+<div class="footer">© 2026 الأستاذ خالد</div>
+
+<button id="backBtn" class="back-btn">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>
+
+<script>
+async function loadData(){
+try{
+const response=await fetch("data.json");
+if(!response.ok) throw new Error();
+const json=await response.json();
+const days=json.days||[];
+
+const todayDate=new Date();
+const todayStr=todayDate.toISOString().split("T")[0];
+const currentMonth=todayDate.getMonth();
+const currentYear=todayDate.getFullYear();
+const startOfWeek=new Date(todayDate);
+startOfWeek.setDate(todayDate.getDate()-todayDate.getDay());
+startOfWeek.setHours(0,0,0,0);
+
+let todayTotal=0,weekTotal=0,monthTotal=0,yearTotal=0;
+let todayTrades=0,totalTrades=0;
+let activeDays=new Set();
+let weeklyData={};
+
+days.forEach(day=>{
+const d=new Date(day.date);
+const profit=Number(day.profit)||0;
+const trades=Number(day.trades)||0;
+
+totalTrades+=trades;
+activeDays.add(day.date);
+
+if(day.date===todayStr){todayTotal+=profit;todayTrades+=trades;}
+if(d>=startOfWeek){weekTotal+=profit;weeklyData[day.date]=(weeklyData[day.date]||0)+profit;}
+if(d.getMonth()===currentMonth&&d.getFullYear()===currentYear){monthTotal+=profit;}
+if(d.getFullYear()===currentYear){yearTotal+=profit;}
+});
+
+document.getElementById("loading").style.display="none";
+document.getElementById("dashboard").style.display="grid";
+document.getElementById("statsRow").style.display="grid";
+document.getElementById("chartContainer").style.display="block";
+
+animate("today",todayTotal);
+animate("week",weekTotal);
+animate("month",monthTotal);
+animate("year",yearTotal);
+animate("trades",todayTrades);
+animate("avgDaily",activeDays.size?Math.round(monthTotal/activeDays.size):0);
+animate("activeDays",activeDays.size);
+animate("totalTrades",totalTrades);
+
+createChart(weeklyData);
+
+}catch(e){
+document.getElementById("loading").style.display="none";
+document.getElementById("error").style.display="block";
+}
+}
+
+function animate(id,val){
+const el=document.getElementById(id);
+let start=0;
+const step=val/60;
+function update(){
+start+=step;
+if(start<val){
+el.innerText=Math.floor(start).toLocaleString();
+requestAnimationFrame(update);
+}else{
+el.innerText=val.toLocaleString();
+}}
+update();
+}
+
+function createChart(data){
+const ctx=document.getElementById("chart").getContext("2d");
+const labels=Object.keys(data).sort();
+const values=labels.map(d=>data[d]);
+
+new Chart(ctx,{
+type:"line",
+data:{labels:labels,datasets:[{data:values,borderColor:"#D4AF37",backgroundColor:"rgba(212,175,55,0.2)",fill:true,tension:.4}]},
+options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+loadData();
+const backBtn=document.getElementById("backBtn");
+backBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+
+let lastScroll=0;
+window.addEventListener("scroll",()=>{
+let current=window.pageYOffset||document.documentElement.scrollTop;
+if(current>lastScroll&&current>50){
+backBtn.classList.add("hidden");
+}else{
+backBtn.classList.remove("hidden");
+}
+lastScroll=current<=0?0:current;
+});
+});
+</script>
+</body>
+</html>
